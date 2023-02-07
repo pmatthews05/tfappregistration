@@ -22,10 +22,6 @@ output "service_principal_object_id" {
   value = azuread_service_principal.service_principal.object_id
 }
 
-output "delegate_assignments_flat" {
-  value = local.delegate_assignments
-}
-
-output "delegate_group" {
-    value =local.delegate_groups
+output "delegate_non_empty" {
+    value = local.delegate_non_empty
 }

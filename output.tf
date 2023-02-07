@@ -1,3 +1,3 @@
-output delegate_group{
-    value = module.appreg_grant.delegate_group 
+output "delegate_non_empty" {
+  value = module.appreg_grant.delegate_non_empty
 }
