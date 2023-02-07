@@ -72,21 +72,17 @@ resource "azuread_service_principal" "service_principal" {
   application_id               = azuread_application.app.application_id
 }
 
-#Loop through required_resource_access, flattening
 resource "azuread_app_role_assignment" "grant_admin" {
-  #for_each = { for ara in local.app_role_assignments }
-  #app_role_id = each.value.app_role_id
-  #principal_object_id = azuread_service_principal.service_principal.object_id
-  #resource_object_id = each.value.resource_object_id
   count               = length(local.app_role_assignments)
   app_role_id         = local.app_role_assignments[count.index].app_role_id
   principal_object_id = azuread_service_principal.service_principal.object_id
   resource_object_id  = local.app_role_assignments[count.index].resource_object_id
 }
 
-//Hard Coded example of granted Delegate permission for Graph.
+#TODO: Read in Names not ID's.
 resource "azuread_service_principal_delegated_permission_grant" "grant_admin" {
+  count = length(local.delegate_non_empty)
   service_principal_object_id          = azuread_service_principal.service_principal.object_id
-  resource_service_principal_object_id = "824be4d8-2fe5-4c93-b688-cdb62b9c1353"
-  claim_values                         = ["Group.ReadWrite.All", "User.Read"]
+  resource_service_principal_object_id = local.delegate_non_empty[count.index].resource_object_id
+  claim_values                         = local.delegate_non_empty[count.index].claims_id
 }
