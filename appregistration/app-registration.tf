@@ -18,11 +18,10 @@ resource "azuread_application" "app" {
   }
 
   dynamic "required_resource_access" {
-    for_each = var.required_resource_access != null ? var.required_resource_access : []
+    for_each = local.app_role_assignments != null ? local.app_role_assignments : []
 
     content {
       resource_app_id = required_resource_access.value.resource_app_id
-
       dynamic "resource_access" {
         for_each = required_resource_access.value.resource_access
         iterator = access
@@ -69,20 +68,19 @@ resource "azuread_application" "app" {
 }
 
 resource "azuread_service_principal" "service_principal" {
-  application_id               = azuread_application.app.application_id
+  application_id = azuread_application.app.application_id
 }
 
 resource "azuread_app_role_assignment" "grant_admin" {
-  count               = length(local.app_role_assignments)
-  app_role_id         = local.app_role_assignments[count.index].app_role_id
+  count               = length(local.app_role_assignments_grants)
+  app_role_id         = local.app_role_assignments_grants[count.index].id
   principal_object_id = azuread_service_principal.service_principal.object_id
-  resource_object_id  = local.app_role_assignments[count.index].resource_object_id
+  resource_object_id  = local.app_role_assignments_grants[count.index].resource_object_id
 }
 
-#TODO: Read in Names not ID's.
 resource "azuread_service_principal_delegated_permission_grant" "grant_admin" {
-  count = length(local.delegate_non_empty)
+  count = length(local.delegate_grants_non_empty)
   service_principal_object_id          = azuread_service_principal.service_principal.object_id
-  resource_service_principal_object_id = local.delegate_non_empty[count.index].resource_object_id
-  claim_values                         = local.delegate_non_empty[count.index].claims_id
+  resource_service_principal_object_id = local.delegate_grants_non_empty[count.index].resource_object_id
+  claim_values                         = local.delegate_grants_non_empty[count.index].claims_id
 }

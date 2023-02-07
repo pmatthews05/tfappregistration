@@ -13,9 +13,9 @@ variable "required_resource_access" {
   description = "A collection of required resource access for this application"
   type        = set(object({
     resource_app_id = string,
-    resource_object_id = string
+    resource_service_principal = any
     resource_access = set(object({
-      id = string
+      name = string
       type = string
     }))
   }))

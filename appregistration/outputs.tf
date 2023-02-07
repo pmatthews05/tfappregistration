@@ -23,5 +23,12 @@ output "service_principal_object_id" {
 }
 
 output "delegate_non_empty" {
-    value = local.delegate_non_empty
+    value = local.delegate_grants_non_empty
+}
+output "app_role_assignments" {
+    value = local.app_role_assignments
+}
+
+output "delegate_assignments" {
+    value = local.delegate_assignments
 }
