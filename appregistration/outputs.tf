@@ -22,7 +22,7 @@ output "service_principal_object_id" {
   value = azuread_service_principal.service_principal.object_id
 }
 
-output "delegate_non_empty" {
+output "delegate_grants" {
     value = local.delegate_grants_non_empty
 }
 output "app_role_assignments" {
@@ -33,10 +33,3 @@ output "app_role_assignments_grants" {
   value = local.app_role_assignments_grants
 }
 
-output "delegate_grants" {
-  value = local.delegate_grants
-}
-
-output "delegate_grants2" {
-  value = local.delegate_grants2
-}

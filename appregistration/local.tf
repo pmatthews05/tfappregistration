@@ -8,9 +8,10 @@ locals {
       resource_app_name  = rra.resource_service_principal.display_name
       resource_access = concat([for ra in required_resource_access.resource_access :
         {
-          id   = rra.resource_service_principal.app_role_ids[ra.name]
-          name = ra.name
-          type = ra.type
+          id    = rra.resource_service_principal.app_role_ids[ra.name]
+          name  = ra.name
+          type  = ra.type
+          admin = true
         }
         if lower(ra.type) == "role"],
         [for ra in required_resource_access.resource_access :
@@ -33,33 +34,21 @@ locals {
         resource_app_id    = ara.resource_app_id
         resource_object_id = ara.resource_object_id
         resource_app_name  = ara.resource_app_name
-        id = ra.id
-        type = ra.type
+        id                 = ra.id
+        type               = ra.type
       }
     ] if lower(ra.type) == "role"]
   ])
 
-  delegate_grants2 = flatten([
+  delegate_grants = flatten([
     for ara in local.app_role_assignments :
     [
       {
-        resource_access = ara.resource_access
-        claims_id = toset([for t in ara.resource_access : t.name if(lower(t.type) == "scope")])
+        claims_id          = toset([for t in ara.resource_access : t.name if(lower(t.type) == "scope" && coalesce(t.admin, false) == true)])
         resource_object_id = ara.resource_object_id
       }
     ]
   ])
-
-
-   delegate_grants = flatten([
-     for rra, required_resource_access in var.required_resource_access :
-     [
-       {
-         claims_id          = toset([for t in rra.resource_access : t.name if(lower(t.type) == "scope")]) #Needs to be the names of just the scope resources for the given resource_object_id
-         resource_object_id = rra.resource_service_principal.object_id
-       }
-     ]
-   ])
 
   delegate_grants_non_empty = [for rra in local.delegate_grants : rra if(length(rra.claims_id) != 0)]
 }
